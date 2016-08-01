@@ -1,0 +1,3 @@
+iinherit_from: rubocop-todo.yml
+AllCops:
+  TargetRubyVersion: 2.3
