@@ -2,7 +2,7 @@
 require_relative './bbs_2ch_url_validator/version'
 
 module Bbs2chUrlValidator
-  # http://www.rubular.com/r/UEVtzBwbtM
+  # http://www.rubular.com/r/cQbzwkui6C
   VALID_2CH_URL_REGEX = %r(^http:\/\/((?<server_name>.+)\.)?(?<is_open>open)?2ch.(?<tld>net|sc)\/?((test\/read\.cgi\/)?(?<board_name>\w+?)\/?((?<thread_key>\d{9,10})\/?)?)?((?<is_dat>dat)\/(?<thread_key2>\d{9,10})\.dat)?((?<is_subject>subject)\.txt)?((?<is_setting>SETTING)\.TXT)?$) # rubocop:disable Metrics/LineLength
 
   class URL
@@ -21,27 +21,26 @@ module Bbs2chUrlValidator
       !parse(url).nil?
     end
 
-    class << self
-      private # rubocop:disable Lint/UselessAccessModifier # for yard
+    private # rubocop:disable Lint/UselessAccessModifier # for yard
 
-      def self.extract_and_sort_group_names
-        VALID_2CH_URL_REGEX.named_captures.to_a \
-                           .sort { |a, b| a[1] <=> b[1] }.map { |n| n[0] }
-      end
+    # rubocop:disable Lint/IneffectiveAccessModifier
+    def self.extract_and_sort_group_names
+      VALID_2CH_URL_REGEX.named_captures.to_a \
+        .sort { |a, b| a[1] <=> b[1] }.map { |n| n[0] } # rubocop:disable all
+    end
 
-      def self.generate_group_name_value_pairs(group_names, matchdata)
-        hash = {}
-        group_names.each_with_index do |n, i|
-          hash[n] = matchdata[i + 1]
-        end
-        hash
+    def self.generate_group_name_value_pairs(group_names, matchdata) # rubocop:disable all
+      hash = {}
+      group_names.each_with_index do |n, i|
+        hash[n] = matchdata[i + 1]
       end
+      hash
+    end
 
-      def self.remove_duplicate_key(hash)
-        hash['thread_key'] = hash['thread_key'] || hash['thread_key2']
-        hash.delete('thread_key2')
-        hash
-      end
+    def self.remove_duplicate_key(hash) # rubocop:disable all
+      hash['thread_key'] ||= hash['thread_key2']
+      hash.delete('thread_key2')
+      hash
     end
   end
 
