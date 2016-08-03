@@ -88,4 +88,77 @@ describe Bbs2chUrlValidator do
       end
     end
   end
+
+  describe '#build_url' do
+    shared_examples 'can build a valid url' do |url, generated_url|
+      subject { b = Bbs2chUrlValidator::URL.parse(url); b.build_url }
+      it { should match generated_url }
+    end
+    urls = [
+      {
+        url: 'http://2ch.sc',
+        generated_url: 'http://2ch.sc'
+      }, {
+        url: 'http://www.2ch.sc',
+        generated_url: 'http://www.2ch.sc'
+      }, {
+        url: 'http://open2ch.net',
+        generated_url: 'http://open2ch.net'
+      }, {
+        url: 'http://2ch.sc/',
+        generated_url: 'http://2ch.sc'
+      }, {
+        url: 'http://www.2ch.sc/',
+        generated_url: 'http://www.2ch.sc'
+      }, {
+        url: 'http://open2ch.net/',
+        generated_url: 'http://open2ch.net'
+      }, {
+        url: 'http://viper.2ch.sc/news4vip',
+        generated_url: 'http://viper.2ch.sc/news4vip/'
+      }, {
+        url: 'http://viper.open2ch.net/news4vip',
+        generated_url: 'http://viper.open2ch.net/news4vip/'
+      }, {
+        url: 'http://viper.2ch.sc/news4vip/',
+        generated_url: 'http://viper.2ch.sc/news4vip/'
+      }, {
+        url: 'http://viper.open2ch.net/news4vip/',
+        generated_url: 'http://viper.open2ch.net/news4vip/'
+      }, {
+        url: 'http://viper.2ch.sc/news4vip/dat/9990000001.dat',
+        generated_url: 'http://viper.2ch.sc/news4vip/dat/9990000001.dat'
+      }, {
+        url: 'http://viper.open2ch.net/news4vip/dat/1439127670.dat',
+        generated_url: 'http://viper.open2ch.net/news4vip/dat/1439127670.dat'
+      }, {
+        url: 'http://viper.2ch.sc/news4vip/subject.txt',
+        generated_url: 'http://viper.2ch.sc/news4vip/subject.txt'
+      }, {
+        url: 'http://viper.open2ch.net/news4vip/subject.txt',
+        generated_url: 'http://viper.open2ch.net/news4vip/subject.txt'
+      }, {
+        url: 'http://viper.2ch.sc/news4vip/SETTING.TXT',
+        generated_url: 'http://viper.2ch.sc/news4vip/SETTING.TXT'
+      }, {
+        url: 'http://viper.open2ch.net/news4vip/SETTING.TXT',
+        generated_url: 'http://viper.open2ch.net/news4vip/SETTING.TXT'
+      }, {
+        url: 'http://viper.2ch.sc/test/read.cgi/news4vip/9990000001',
+        generated_url: 'http://viper.2ch.sc/test/read.cgi/news4vip/9990000001/'
+      }, {
+        url: 'http://viper.open2ch.net/test/read.cgi/news4vip/1439127670',
+        generated_url: 'http://viper.open2ch.net/test/read.cgi/news4vip/1439127670'
+      }, {
+        url: 'http://viper.2ch.sc/test/read.cgi/news4vip/9990000001/',
+        generated_url: 'http://viper.2ch.sc/test/read.cgi/news4vip/9990000001/'
+      }, {
+        url: 'http://viper.open2ch.net/test/read.cgi/news4vip/1439127670/',
+        generated_url: 'http://viper.open2ch.net/test/read.cgi/news4vip/1439127670/'
+      }
+    ]
+    urls.each do |u|
+      it_behaves_like 'can build a valid url', u[:url], u[:generated_url]
+    end
+  end
 end

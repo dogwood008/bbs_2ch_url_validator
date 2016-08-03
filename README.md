@@ -39,3 +39,7 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/dogwoo
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
+## History
+
+- v0.1.1 Add UrlInfo#build_url
+- v0.1.0 first release
