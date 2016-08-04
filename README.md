@@ -22,7 +22,11 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+b = Bbs2chUrlValidator::URL.parse('http://viper.2ch.sc/test/read.cgi/news4vip/9990000001/')
+# => #<Bbs2chUrlValidator::UrlInfo:0x007f7a0901c950 @server_name="viper", @is_open=false, @tld="sc", @board_name="news4vip", @thread_key="9990000001", @is_dat=false, @is_subject=false, @is_setting=false, @built_url="http://viper.2ch.sc/test/read.cgi/news4vip/9990000001/">
+```
+
 
 ## Development
 
@@ -41,5 +45,6 @@ The gem is available as open source under the terms of the [MIT License](http://
 
 ## History
 
+- v0.1.2 Put #build_url into instance variable 'built_url'
 - v0.1.1 Add UrlInfo#build_url
 - v0.1.0 first release
