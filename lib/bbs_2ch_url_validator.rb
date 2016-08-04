@@ -45,14 +45,21 @@ module Bbs2chUrlValidator
   end
 
   class UrlInfo
-    attr_reader :server_name, :tld, :board_name, :thread_key, :is_open, \
-                :is_dat, :is_subject, :is_setting
+    # @return [String]
+    attr_reader :server_name, :tld, :board_name, :thread_key, :is_open, :built_url
+    # @return [Boolean]
+    attr_reader :is_dat, :is_subject, :is_setting
+
+    # @param [Hash] hash
     def initialize(hash)
       hash.each do |k, v|
         value = k.start_with?('is_') ? !v.nil? : v
         instance_variable_set("@#{k}", value)
       end
+      @built_url = build_url
     end
+
+    private
 
     def build_url
       if @is_dat || @is_subject || @is_setting
@@ -68,8 +75,6 @@ module Bbs2chUrlValidator
         combine_url(nil)
       end
     end
-
-    private
 
     def generate_special_url
       if @is_dat
