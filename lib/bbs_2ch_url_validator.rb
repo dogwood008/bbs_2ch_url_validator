@@ -46,9 +46,10 @@ module Bbs2chUrlValidator
 
   class UrlInfo
     # @return [String]
-    attr_reader :server_name, :tld, :board_name, :thread_key, :is_open, :built_url
+    attr_reader :server_name, :tld, :board_name, :thread_key, :built_url
     # @return [Boolean]
-    attr_reader :is_dat, :is_subject, :is_setting
+    # @deprecated
+    attr_reader :is_dat, :is_subject, :is_setting, :is_open
 
     # @param [Hash] hash
     def initialize(hash)
@@ -57,13 +58,32 @@ module Bbs2chUrlValidator
         instance_variable_set("@#{k}", value)
       end
       @built_url = build_url
+      define_methods
+    end
+
+    def dat
+      generate_special_url(:dat)
+    end
+
+    def subject
+      generate_special_url(:subject)
+    end
+
+    def setting
+      generate_special_url(:setting)
     end
 
     private
 
+    def define_methods
+      %w(is_open is_dat is_subject is_setting).each do |attr|
+        self.class.send(:define_method, attr.gsub(/is_(.+)/) { "#{$1}?" }) { attr }
+      end
+    end
+
     def build_url
       if @is_dat || @is_subject || @is_setting
-        generate_special_url
+        generate_special_url_by_flags
       elsif @thread_key
         # http://viper.2ch.sc/test/read.cgi/news4vip/9990000001/
         combine_url("/test/read.cgi/#{@board_name}/#{@thread_key}/")
@@ -76,14 +96,28 @@ module Bbs2chUrlValidator
       end
     end
 
-    def generate_special_url
+    def generate_special_url_by_flags
       if @is_dat
+        generate_special_url(:dat)
+      elsif @is_subject
+        generate_special_url(:subject)
+      elsif @is_setting
+        generate_special_url(:setting)
+      end
+    end
+
+    def generate_special_url(type)
+      case type
+      when :dat
+        return nil unless @board_name && @thread_key
         # http://viper.2ch.sc/news4vip/dat/9990000001.dat
         combine_url("/#{@board_name}/dat/#{@thread_key}.dat")
-      elsif @is_subject
+      when :subject
+        return nil unless @board_name
         # http://viper.2ch.sc/news4vip/subject.txt
         combine_url("/#{@board_name}/subject.txt")
-      elsif @is_setting
+      when :setting
+        return nil unless @board_name
         # http://viper.2ch.sc/news4vip/SETTING.TXT
         combine_url("/#{@board_name}/SETTING.TXT")
       end
