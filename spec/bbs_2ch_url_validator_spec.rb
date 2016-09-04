@@ -4,6 +4,9 @@ require 'spec_helper'
 describe Bbs2chUrlValidator do
   valid_urls = {
     top_sc: { url: 'http://www.2ch.sc',
+              setting: nil,
+              subject: nil,
+              dat: nil,
               params: { server_name: 'www', tld: 'sc' } },
     top_open: { url: 'http://open2ch.net',
                 params: { is_open: true, tld: 'net' } },
@@ -41,6 +44,9 @@ describe Bbs2chUrlValidator do
     thread_sc_with_slash: { url: 'http://viper.2ch.sc/test/read.cgi/news4vip/9990000001/',
                   params: { thread_key: '9990000001' , server_name: 'viper', board_name: 'news4vip', tld: 'sc' } },
     thread_open_with_slash: { url: 'http://viper.open2ch.net/test/read.cgi/news4vip/1439127670/',
+                              setting: 'http://viper.open2ch.net/news4vip/SETTING.TXT',
+                              subject: 'http://viper.open2ch.net/news4vip/subject.txt',
+                              dat: 'http://viper.open2ch.net/news4vip/dat/1439127670.dat',
                   params: { thread_key: '1439127670', is_open: true, server_name: 'viper',\
                             board_name: 'news4vip', tld: 'net' } }
   }
@@ -158,6 +164,45 @@ describe Bbs2chUrlValidator do
       ]
       urls.each do |u|
         it_behaves_like 'can build a valid url', u[:url], u[:generated_url]
+      end
+    end
+  end
+
+  describe 'UrlInfo#setting' do
+    shared_examples 'build setting url' do |original_url, result|
+      let(:urlinfo) { Bbs2chUrlValidator::URL.parse(original_url) }
+      subject { urlinfo.setting }
+      it { should eq result }
+    end
+    context 'build url suceessfully' do
+      original_url = valid_urls[:thread_open_with_slash][:url]
+      result = valid_urls[:thread_open_with_slash][:setting]
+      it_behaves_like 'build setting url', original_url, result
+    end
+    context 'fail when some parameters lacked' do
+      original_url = valid_urls[:top_sc][:url]
+      result = valid_urls[:top_sc][:setting]
+      it_behaves_like 'build setting url', original_url, result
+    end
+  end
+
+  describe 'build urls' do
+    shared_examples 'build url' do |method, url_type |
+      let(:original_url) { valid_urls[url_type][:url] }
+      let(:result) { valid_urls[url_type][method] }
+      let(:urlinfo) { Bbs2chUrlValidator::URL.parse(original_url) }
+      subject { urlinfo.method(method).call }
+      it { should eq result }
+    end
+
+    [:subject, :dat, :setting].each do |type|
+      describe "UrlInfo##{type}" do
+        context 'build url suceessfully' do
+          it_behaves_like 'build url', type, :thread_open_with_slash
+        end
+        context 'fail when some parameters lacked' do
+          it_behaves_like 'build url', type, :top_sc
+        end
       end
     end
   end
