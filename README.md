@@ -45,6 +45,7 @@ The gem is available as open source under the terms of the [MIT License](http://
 
 ## History
 
+- v0.1.3 Add Bbs2chUrlValidator::URL#subject, #dat, #setting, #dat?, #subject?, #setting?, #open?
 - v0.1.2 Put #build_url into instance variable 'built_url'
 - v0.1.1 Add UrlInfo#build_url
 - v0.1.0 first release
