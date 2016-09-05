@@ -7,8 +7,10 @@ describe Bbs2chUrlValidator do
               setting: nil,
               subject: nil,
               dat: nil,
+              flags: { dat: false, subject: false, setting: false, open: false },
               params: { server_name: 'www', tld: 'sc' } },
     top_open: { url: 'http://open2ch.net',
+                flags: { dat: false, subject: false, setting: false, open: true },
                 params: { is_open: true, tld: 'net' } },
     top_sc_ends_with_slash: { url: 'http://www.2ch.sc/',
                               params: { server_name: 'www', tld: 'sc' } },
@@ -26,13 +28,16 @@ describe Bbs2chUrlValidator do
               params: { is_dat: true, server_name: 'viper', board_name: 'news4vip', \
                         thread_key: '9990000001', tld: 'sc' } },
     dat_open: { url: 'http://viper.open2ch.net/news4vip/dat/1439127670.dat',
+                flags: { subject: false, dat: true, setting: false, open: true },
                 params: { is_open: true, is_dat: true, server_name: 'viper', board_name: 'news4vip',
                           thread_key: '1439127670', tld: 'net' } },
     subject_sc: { url: 'http://viper.2ch.sc/news4vip/subject.txt',
+                  flags: { subject: true, dat: false, setting: false, open: false },
                   params: { is_subject: true, server_name: 'viper', board_name: 'news4vip', tld: 'sc' } },
     subject_open: { url: 'http://viper.open2ch.net/news4vip/subject.txt',
                   params: { is_open: true, is_subject: true, server_name: 'viper', board_name: 'news4vip', tld: 'net' } },
     setting_sc: { url: 'http://viper.2ch.sc/news4vip/SETTING.TXT',
+                  flags: { subject: false, dat: false, setting: true, open: false },
                   params: { is_setting: true, server_name: 'viper', board_name: 'news4vip', tld: 'sc' } },
     setting_open: { url: 'http://viper.open2ch.net/news4vip/SETTING.TXT',
                   params: { is_open: true, is_setting: true, server_name: 'viper', board_name: 'news4vip', tld: 'net' } },
@@ -186,23 +191,49 @@ describe Bbs2chUrlValidator do
     end
   end
 
-  describe 'build urls' do
-    shared_examples 'build url' do |method, url_type |
-      let(:original_url) { valid_urls[url_type][:url] }
-      let(:result) { valid_urls[url_type][method] }
-      let(:urlinfo) { Bbs2chUrlValidator::URL.parse(original_url) }
-      subject { urlinfo.method(method).call }
-      it { should eq result }
-    end
+  shared_examples 'build url' do |method, url_type |
+    let(:original_url) { valid_urls[url_type][:url] }
+    let(:result) { valid_urls[url_type][method] }
+    let(:urlinfo) { Bbs2chUrlValidator::URL.parse(original_url) }
+    subject { urlinfo.method(method).call }
+    it { should eq result }
+  end
 
-    [:subject, :dat, :setting].each do |type|
-      describe "UrlInfo##{type}" do
-        context 'build url suceessfully' do
-          it_behaves_like 'build url', type, :thread_open_with_slash
-        end
-        context 'fail when some parameters lacked' do
-          it_behaves_like 'build url', type, :top_sc
-        end
+  [:subject, :dat, :setting].each do |method|
+    describe "UrlInfo##{method}" do
+      context 'build url suceessfully' do
+        it_behaves_like 'build url', method, :thread_open_with_slash
+      end
+      context 'fail when some parameters lacked' do
+        it_behaves_like 'build url', method, :top_sc
+      end
+    end
+  end
+
+  shared_examples 'return flag' do |method, url_type|
+    let(:url) { valid_urls[url_type][:url] }
+    let(:result) { valid_urls[url_type][:flags][method] }
+    let(:urlinfo) { Bbs2chUrlValidator::URL.parse(url) }
+    subject { urlinfo.method("#{method}?").call }
+    it { should be result }
+  end
+
+  [:subject, :dat, :setting, :open].each do |method|
+    describe "UrlInfo##{method}?" do
+      context 'pattern A (none)' do
+        it_behaves_like 'return flag', method, :top_sc
+      end
+      context 'pattern B (open)' do
+        it_behaves_like 'return flag', method, :top_open
+      end
+      context 'pattern C (dat, open)' do
+        it_behaves_like 'return flag', method, :dat_open
+      end
+      context 'pattern D (subject)' do
+        it_behaves_like 'return flag', method, :subject_sc
+      end
+      context 'pattern E (setting)' do
+        it_behaves_like 'return flag', method, :setting_sc
       end
     end
   end
