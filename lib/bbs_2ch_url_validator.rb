@@ -73,6 +73,10 @@ module Bbs2chUrlValidator
       generate_special_url(:setting)
     end
 
+    def to_s
+      built_url
+    end
+
     private
 
     def define_methods
