@@ -77,7 +77,9 @@ module Bbs2chUrlValidator
 
     def define_methods
       %w(is_open is_dat is_subject is_setting).each do |attr|
-        self.class.send(:define_method, attr.gsub(/is_(.+)/) { "#{$1}?" }) { attr }
+        method_name = attr.gsub(/is_(.+)/) { "#{$1}?" }
+        self.class.send(:define_method,
+                        method_name) { instance_variable_get("@#{attr}") }
       end
     end
 
