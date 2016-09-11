@@ -45,6 +45,7 @@ The gem is available as open source under the terms of the [MIT License](http://
 
 ## History
 
+- v0.1.5 Ignore res number(s) on URL  (e.g.) http://toro.open2ch.net/test/read.cgi/tech/1371956681/l50
 - v0.1.4 Fix bugs of these: #dat?, #subject?, #setting?, #open? and override UrlInfo#to_s
 - v0.1.3 Add Bbs2chUrlValidator::URL#subject, #dat, #setting, #dat?, #subject?, #setting?, #open?
 - v0.1.2 Put #build_url into instance variable 'built_url'

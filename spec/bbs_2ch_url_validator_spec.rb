@@ -53,7 +53,12 @@ describe Bbs2chUrlValidator do
                               subject: 'http://viper.open2ch.net/news4vip/subject.txt',
                               dat: 'http://viper.open2ch.net/news4vip/dat/1439127670.dat',
                   params: { thread_key: '1439127670', is_open: true, server_name: 'viper',\
-                            board_name: 'news4vip', tld: 'net' } }
+                            board_name: 'news4vip', tld: 'net' } },
+    with_res_num_sc: { url: 'http://viper.2ch.sc/test/read.cgi/news4vip/9990000001/1',
+                       params: { thread_key: '9990000001', is_open: false, is_subject: false, server_name: 'viper', board_name: 'news4vip', tld: 'sc' } },
+    with_res_num_open: { url: 'http://viper.open2ch.net/test/read.cgi/news4vip/1439127670/l50',
+                         params: { thread_key: '1439127670', is_open: true, is_subject: false, server_name: 'viper', board_name: 'news4vip', tld: 'net' } }
+
   }
   invalid_urls = {
     yahoo: { url: 'http://yahoo.co.jp', params: {} },
@@ -72,9 +77,10 @@ describe Bbs2chUrlValidator do
       its(:tld) { should match params[:tld] }
       its(:board_name) { should match params[:board_name] }
       its(:thread_key) { should match params[:thread_key] }
-      its(:is_dat) { should be !params[:is_dat].nil? }
-      its(:is_subject) { should be !params[:is_subject].nil? }
-      its(:is_setting) { should be !params[:is_setting].nil? }
+      its(:open?) { should be !!params[:is_open] }
+      its(:dat?) { should be !!params[:is_dat] }
+      its(:subject?) { should be !!params[:is_subject] }
+      its(:setting?) { should be !!params[:is_setting] }
     end
 
     shared_examples 'check given urls' do |urls|

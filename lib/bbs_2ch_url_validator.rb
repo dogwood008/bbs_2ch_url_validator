@@ -2,8 +2,8 @@
 require_relative './bbs_2ch_url_validator/version'
 
 module Bbs2chUrlValidator
-  # http://www.rubular.com/r/nFpFxFptsZ
-  VALID_2CH_URL_REGEX = %r(^http:\/\/((?<server_name>.+)\.)?(?<is_open>open)?2ch.(?<tld>net|sc)\/?((test\/read\.cgi\/)?(?<board_name>\w+?)\/?((?<thread_key>\d{9,10})\/?)?)?((?<is_dat>dat)\/(?<thread_key2>\d{9,10})\.dat)?((?<is_subject>subject)\.txt)?((?<is_setting>SETTING)\.TXT)?$) # rubocop:disable Metrics/LineLength
+  # http://www.rubular.com/r/mxKUUaB6bg
+  VALID_2CH_URL_REGEX = %r(^http:\/\/((?<server_name>.+)\.)?(?<is_open>open)?2ch.(?<tld>net|sc)\/?((test\/read\.cgi\/)?(?<board_name>\w+?)\/?((?<thread_key>\d{9,10})(?:\/?(\d|l)*)?)?)?((?<is_dat>dat)\/(?<thread_key2>\d{9,10})\.dat)?((?<is_subject>subject)\.txt)?((?<is_setting>SETTING)\.TXT)?$) # rubocop:disable Metrics/LineLength
 
   class URL
     # @params [URI or String] url URL
@@ -58,7 +58,6 @@ module Bbs2chUrlValidator
         instance_variable_set("@#{k}", value)
       end
       @built_url = build_url
-      define_methods
     end
 
     def dat
@@ -77,15 +76,15 @@ module Bbs2chUrlValidator
       built_url
     end
 
-    private
+    def open?; @is_open end
 
-    def define_methods
-      %w(is_open is_dat is_subject is_setting).each do |attr|
-        method_name = attr.gsub(/is_(.+)/) { "#{$1}?" }
-        self.class.send(:define_method,
-                        method_name) { instance_variable_get("@#{attr}") }
-      end
-    end
+    def dat?; @is_dat end
+
+    def subject?; @is_subject end
+
+    def setting?; @is_setting end
+
+    private
 
     def build_url
       if @is_dat || @is_subject || @is_setting
